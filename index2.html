@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Clock</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"Segoe UI",Tahoma,sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:#fff;
+padding:20px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+/* مصر - بطاقة رئيسية */
+.main-card{
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(15px);
+border:1px solid rgba(255,255,255,0.2);
+border-radius:25px;
+padding:30px;
+text-align:center;
+margin-bottom:25px;
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+.main-title{
+font-size:28px;
+font-weight:bold;
+}
+
+.main-time{
+font-size:50px;
+margin-top:10px;
+font-weight:bold;
+font-variant-numeric:tabular-nums;
+}
+
+.date{
+margin-top:10px;
+font-size:18px;
+opacity:0.9;
+}
+
+.period{
+margin-top:10px;
+font-size:20px;
+}
+
+/* Grid باقي الدول */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+}
+
+.card{
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(12px);
+border-radius:18px;
+padding:20px;
+text-align:center;
+transition:0.3s;
+border:1px solid rgba(255,255,255,0.15);
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.country{
+font-size:20px;
+font-weight:bold;
+}
+
+.time{
+font-size:28px;
+margin-top:10px;
+font-variant-numeric:tabular-nums;
+}
+
+.offset{
+margin-top:8px;
+font-size:14px;
+opacity:0.85;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+opacity:0.8;
+font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- مصر -->
+<div class="main-card">
+<div class="main-title">🇪🇬 مصر</div>
+<div class="main-time" id="egyTime">--:--:--</div>
+<div class="period" id="egyPeriod"></div>
+<div class="date" id="egyDate"></div>
+</div>
+
+<!-- باقي الدول -->
+<div class="grid" id="grid"></div>
+
+<div class="footer">
+يتم تحديث الوقت كل ثانية
+</div>
+
+</div>
+<script>
+const cities = [
+{ name:"🇮🇶 العراق", tz:"Asia/Baghdad" },
+{ name:"🇦🇪 الإمارات", tz:"Asia/Dubai" },
+{ name:"🇧🇭 البحرين", tz:"Asia/Bahrain" },
+{ name:"🇯🇴 الأردن", tz:"Asia/Amman" },
+{ name:"🇰🇼 الكويت", tz:"Asia/Kuwait" },
+{ name:"🇶🇦 قطر", tz:"Asia/Qatar" },
+{ name:"🇴🇲 عمان", tz:"Asia/Muscat" }
+];
+
+// إنشاء البطاقات
+const grid = document.getElementById("grid");
+
+cities.forEach((c, i) => {
+const div = document.createElement("div");
+div.className = "card";
+div.innerHTML = `
+<div class="country">${c.name}</div>
+<div class="time" id="t${i}">--:--:--</div>
+<div class="offset" id="o${i}"></div>
+`;
+grid.appendChild(div);
+});
+
+// formatter ثابت (أداء أفضل)
+function makeFormatter(tz){
+return new Intl.DateTimeFormat("en-US",{
+timeZone:tz,
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
+hour12:true
+});
+}
+
+const egyptFormatter = makeFormatter("Africa/Cairo");
+
+// مصر reference time
+function getEgyptParts(){
+const now = new Date();
+const parts = egyptFormatter.formatToParts(now);
+
+let h,m,s,ap;
+parts.forEach(p=>{
+if(p.type==="hour") h=p.value;
+if(p.type==="minute") m=p.value;
+if(p.type==="second") s=p.value;
+if(p.type==="dayPeriod") ap=p.value;
+});
+
+return {h,m,s,ap};
+}
+
+// حساب فرق التوقيت الحقيقي (بدون مشاكل DST)
+function diffHours(tz){
+const now = new Date();
+
+const cairo = new Date(
+now.toLocaleString("en-US",{timeZone:"Africa/Cairo"})
+);
+
+const target = new Date(
+now.toLocaleString("en-US",{timeZone:tz})
+);
+
+return (target - cairo) / 3600000;
+}
+
+// تحديث الساعة
+function update(){
+
+// ===== مصر =====
+const eg = getEgyptParts();
+
+document.getElementById("egyTime").textContent =
+`${eg.h}:${eg.m}:${eg.s}`;
+
+document.getElementById("egyPeriod").textContent =
+(eg.ap === "AM")
+? "🌞 صباحًا"
+: "🌙 مساءً";
+
+// التاريخ
+document.getElementById("egyDate").textContent =
+new Date().toLocaleDateString("ar-EG",{
+weekday:"long",
+year:"numeric",
+month:"long",
+day:"numeric"
+});
+
+// ===== باقي الدول =====
+cities.forEach((c,i)=>{
+
+const fmt = makeFormatter(c.tz);
+
+const parts = fmt.formatToParts(new Date());
+
+let h,m,s,ap;
+parts.forEach(p=>{
+if(p.type==="hour") h=p.value;
+if(p.type==="minute") m=p.value;
+if(p.type==="second") s=p.value;
+if(p.type==="dayPeriod") ap=p.value;
+});
+
+document.getElementById("t"+i).textContent =
+`${h}:${m}:${s}`;
+
+// 🌞 / 🌙 حسب الوقت الفعلي (6 صباحًا / 6 مساءً)
+const hour24 = new Date().toLocaleString("en-US",{timeZone:c.tz,hour12:false,hour:"2-digit"});
+const hour = parseInt(hour24);
+
+const icon = (hour >= 6 && hour < 18) ? "🌞" : "🌙";
+
+document.getElementById("o"+i).textContent =
+`${icon} فرق ${diffHours(c.tz).toFixed(0)} ساعة عن مصر`;
+});
+
+}
+
+// تشغيل أول مرة + كل ثانية
+update();
+setInterval(update,1000);
+</script>
+
+</body>
+</html>
