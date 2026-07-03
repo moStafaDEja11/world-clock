@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الوقت الآن</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Tahoma,sans-serif;
+}
+
+body{
+    background:#101820;
+    color:#fff;
+    padding:25px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+    font-size:35px;
+}
+
+.main-clock{
+    background:#1a2639;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    margin-bottom:30px;
+    box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+
+.main-clock h2{
+    font-size:28px;
+    margin-bottom:10px;
+}
+
+.main-time{
+    font-size:42px;
+    font-weight:bold;
+    color:#4fc3f7;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#1a2639;
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 0 15px rgba(0,0,0,.35);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.country{
+    font-size:24px;
+    margin-bottom:15px;
+}
+
+.time{
+    font-size:34px;
+    color:#4fc3f7;
+    font-weight:bold;
+}
+
+.diff{
+    margin-top:12px;
+    color:#9fdfff;
+    font-size:15px;
+}
+
+@media(max-width:600px){
+.main-time{
+font-size:34px;
+}
+.time{
+font-size:28px;
+}
+}
+</style>
+
+</head>
+<body>
+
+<h1>🌍 الوقت الآن</h1>
+
+<div class="main-clock">
+<h2>🇪🇬 مصر</h2>
+<div id="egypt" class="main-time"></div>
+</div>
+
+<div class="container">
+
+<div class="card">
+<div class="country">🇮🇶 العراق</div>
+<div id="iraq" class="time"></div>
+<div class="diff">(+1 عن مصر)</div>
+</div>
+
+<div class="card">
+<div class="country">🇦🇪 الإمارات</div>
+<div id="uae" class="time"></div>
+<div class="diff">(+2 عن مصر)</div>
+</div>
+
+<div class="card">
+<div class="country">🇧🇭 البحرين</div>
+<div id="bahrain" class="time"></div>
+<div class="diff">(+1 عن مصر)</div>
+</div>
+
+<div class="card">
+<div class="country">🇯🇴 الأردن</div>
+<div id="jordan" class="time"></div>
+<div class="diff">(نفس توقيت مصر)</div>
+</div>
+
+<div class="card">
+<div class="country">🇰🇼 الكويت</div>
+<div id="kuwait" class="time"></div>
+<div class="diff">(+1 عن مصر)</div>
+</div>
+
+<div class="card">
+<div class="country">🇶🇦 قطر</div>
+<div id="qatar" class="time"></div>
+<div class="diff">(+1 عن مصر)</div>
+</div>
+
+<div class="card">
+<div class="country">🇴🇲 عمان</div>
+<div id="oman" class="time"></div>
+<div class="diff">(+2 عن مصر)</div>
+</div>
+
+</div>
+
+<script>
+
+function showTime(id,zone){
+
+document.getElementById(id).innerHTML=
+new Date().toLocaleTimeString("en-US",{
+
+timeZone:zone,
+hour:"numeric",
+minute:"2-digit",
+second:"2-digit",
+hour12:true
+
+});
+
+}
+
+function update(){
+
+showTime("egypt","Africa/Cairo");
+showTime("iraq","Asia/Baghdad");
+showTime("uae","Asia/Dubai");
+showTime("bahrain","Asia/Bahrain");
+showTime("jordan","Asia/Amman");
+showTime("kuwait","Asia/Kuwait");
+showTime("qatar","Asia/Qatar");
+showTime("oman","Asia/Muscat");
+
+}
+
+update();
+setInterval(update,1000);
+
+</script>
+
+</body>
+</html>
