@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -91,6 +92,7 @@ font-size:28px;
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
 </head>
 <body>
 
@@ -106,80 +108,54 @@ font-size:28px;
 <div class="card">
 <div class="country">🇮🇶 العراق</div>
 <div id="iraq" class="time"></div>
-<div class="diff">(+1 عن مصر)</div>
+<div id="diff-iraq" class="diff">(+1 عن مصر)</div>
 </div>
 
 <div class="card">
 <div class="country">🇦🇪 الإمارات</div>
 <div id="uae" class="time"></div>
-<div class="diff">(+2 عن مصر)</div>
+<div id="diff-uae" class="diff">(+2 عن مصر)</div>
 </div>
 
 <div class="card">
 <div class="country">🇧🇭 البحرين</div>
 <div id="bahrain" class="time"></div>
-<div class="diff">(+1 عن مصر)</div>
+<div id="diff-bahrain" class="diff">(+1 عن مصر)</div>
 </div>
 
 <div class="card">
 <div class="country">🇯🇴 الأردن</div>
 <div id="jordan" class="time"></div>
-<div class="diff">(نفس توقيت مصر)</div>
+<div id="diff-jordan" class="diff">(نفس توقيت مصر)</div>
 </div>
 
 <div class="card">
 <div class="country">🇰🇼 الكويت</div>
 <div id="kuwait" class="time"></div>
-<div class="diff">(+1 عن مصر)</div>
+<div id="diff-kuwait" class="diff">(+1 عن مصر)</div>
 </div>
 
 <div class="card">
 <div class="country">🇶🇦 قطر</div>
 <div id="qatar" class="time"></div>
-<div class="diff">(+1 عن مصر)</div>
+<div id="diff-qatar" class="diff">(+1 عن مصر)</div>
 </div>
 
 <div class="card">
 <div class="country">🇴🇲 عمان</div>
 <div id="oman" class="time"></div>
-<div class="diff">(+2 عن مصر)</div>
+<div id="diff-oman" class="diff">(+2 عن مصر)</div>
 </div>
 
 </div>
 
 <script>
-
-function showTime(id,zone){
-
-document.getElementById(id).innerHTML=
-new Date().toLocaleTimeString("en-US",{
-
-timeZone:zone,
-hour:"numeric",
-minute:"2-digit",
-second:"2-digit",
-hour12:true
-
-});
-
-}
-
-function update(){
-
-showTime("egypt","Africa/Cairo");
-showTime("iraq","Asia/Baghdad");
-showTime("uae","Asia/Dubai");
-showTime("bahrain","Asia/Bahrain");
-showTime("jordan","Asia/Amman");
-showTime("kuwait","Asia/Kuwait");
-showTime("qatar","Asia/Qatar");
-showTime("oman","Asia/Muscat");
-
-}
-
-update();
-setInterval(update,1000);
-
+const DateTime=luxon.DateTime;
+function fmt(zone){return DateTime.now().setZone(zone).toFormat("hh:mm:ss a").replace("AM","صباحًا").replace("PM","مساءً");}
+function show(id,z){document.getElementById(id).textContent=fmt(z);}
+function diff(id,z){let e=DateTime.now().setZone("Africa/Cairo").offset,c=DateTime.now().setZone(z).offset,d=(c-e)/60;document.getElementById(id).textContent=d==0?"نفس توقيت مصر":`${d>0?"+":""}${d} ساعة عن مصر`;}
+function update(){show("egypt","Africa/Cairo");show("iraq","Asia/Baghdad");show("uae","Asia/Dubai");show("bahrain","Asia/Bahrain");show("jordan","Asia/Amman");show("kuwait","Asia/Kuwait");show("qatar","Asia/Qatar");show("oman","Asia/Muscat");diff("diff-iraq","Asia/Baghdad");diff("diff-uae","Asia/Dubai");diff("diff-bahrain","Asia/Bahrain");diff("diff-jordan","Asia/Amman");diff("diff-kuwait","Asia/Kuwait");diff("diff-qatar","Asia/Qatar");diff("diff-oman","Asia/Muscat");}
+update();setInterval(update,1000);
 </script>
 
 </body>
